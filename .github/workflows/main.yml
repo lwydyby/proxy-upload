@@ -28,5 +28,4 @@ jobs:
         username: ${{secrets.DOCKER_USERNAME}}
         # The login password for the registry
         password: ${{secrets.DOCKER_PASSWORD}}
-          # Use registry for pushing to a custom registry
-        registry: ${{secrets.DOCKER_REGISTRY}}
+
