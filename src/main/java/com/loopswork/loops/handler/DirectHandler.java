@@ -36,7 +36,7 @@ public class DirectHandler implements Handler<RoutingContext> {
     TargetInfo targetInfo = targetUtil.getTargetInfo();
     HttpClient client =  clientManager.getCurrentThreadHttpClient();
     HttpClientRequest c_req = client.request(VertHttpRequestWrapper.transMethod(request.getMethod()), SocketAddress.inetSocketAddress(targetInfo.getPort(), targetInfo.getHost())
-      , targetInfo.getPort(), targetInfo.getHost(), targetInfo.getRemoteUri(), res -> {
+      , targetInfo.getPort(), targetInfo.getHost(), req.uri(), res -> {
           context.response().setChunked(true);
           context.response().setStatusCode(res.statusCode());
           context.response().headers().setAll(res.headers());
