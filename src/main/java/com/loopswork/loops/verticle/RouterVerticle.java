@@ -40,8 +40,6 @@ public class RouterVerticle extends AbstractVerticle {
       // 限制Content-Length大小
       // To do
       routingContext.request().handler(buffer -> {
-        System.out.println("I have received a chunk of the body of length " + buffer.length(
-        ));
         FileOutputStream fos = null;
         // 开一个流写文件
         try {
