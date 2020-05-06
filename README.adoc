@@ -23,13 +23,74 @@ To run your application:
 
 == Run with docker
 
-1. To run docker-compose:
+1. To run docker-compose(machine1):
 ```
 docker-compose up -d
 ```
 
 The service port is 9000
 
+2. To run the upload server on another machine(machine2)
+
+I built a simple upload service on port 9001，You can use this docker directly
+
+```
+docker-compose up -d
+```
+The service port is 9001
+
+3. Edit docker-compose
+
+Replace host value
+
+```
+version: "2"
+
+services:
+  loops:
+    image: "lwydyby/upload-test:latest"
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      host: ${machine2 ip}
+      port: 9001
+      JAVA_OPTS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    mem_limit: 4G
+```
+
+4. upload by proxy
+
+```
+curl  -F "file=@/var/Windows-Server-2008-r2-Standard-Public.qcow2" "http://127.0.0.1:9000"
+```
+
+5. You can see the exception：
+
+```
+io.netty.util.internal.OutOfDirectMemoryError: failed to allocate 16777216 byte(s) of direct memory (used: 939524127, max: 954728448)
+	at io.netty.util.internal.PlatformDependent.incrementMemoryCounter(PlatformDependent.java:725)
+	at io.netty.util.internal.PlatformDependent.allocateDirectNoCleaner(PlatformDependent.java:680)
+	at io.netty.buffer.PoolArena$DirectArena.allocateDirect(PoolArena.java:758)
+	at io.netty.buffer.PoolArena$DirectArena.newChunk(PoolArena.java:734)
+	at io.netty.buffer.PoolArena.allocateNormal(PoolArena.java:245)
+	at io.netty.buffer.PoolArena.allocate(PoolArena.java:227)
+	at io.netty.buffer.PoolArena.allocate(PoolArena.java:147)
+	at io.netty.buffer.PooledByteBufAllocator.newDirectBuffer(PooledByteBufAllocator.java:342)
+	at io.netty.buffer.AbstractByteBufAllocator.directBuffer(AbstractByteBufAllocator.java:187)
+	at io.netty.buffer.AbstractByteBufAllocator.directBuffer(AbstractByteBufAllocator.java:178)
+	at io.vertx.core.net.impl.PartialPooledByteBufAllocator.ioBuffer(PartialPooledByteBufAllocator.java:62)
+	at io.netty.channel.DefaultMaxMessagesRecvByteBufAllocator$MaxMessageHandle.allocate(DefaultMaxMessagesRecvByteBufAllocator.java:114)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:147)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:700)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:635)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:552)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:514)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$6.run(SingleThreadEventExecutor.java:1044)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.lang.Thread.run(Thread.java:748)
+```
 
 
 == environment:

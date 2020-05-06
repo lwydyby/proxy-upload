@@ -35,10 +35,6 @@ public class RouterVerticle extends AbstractVerticle {
 
     Router router1=Router.router(vertx);
     router1.post().handler(routingContext -> {
-      String length = routingContext.request().headers().get("Content-Length");
-      System.out.println("Content-Length: " +length);
-      // 限制Content-Length大小
-      // To do
       routingContext.request().handler(buffer -> {
         FileOutputStream fos = null;
         // 开一个流写文件
