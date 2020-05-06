@@ -23,14 +23,14 @@ To run your application:
 
 == Run with docker
 
-1. To run docker-compose(machine1):
+To run docker-compose(machine1):
 ```
 docker-compose up -d
 ```
 
 The service port is 9000
 
-2. To run the upload server on another machine(machine2)
+To run the upload server on another machine(machine2)
 
 I built a simple upload service on port 9001，You can use this docker directly
 
@@ -39,7 +39,7 @@ docker-compose up -d
 ```
 The service port is 9001
 
-3. Edit docker-compose
+Edit docker-compose
 
 Replace host value
 
@@ -59,13 +59,13 @@ services:
     mem_limit: 4G
 ```
 
-4. upload by proxy
+upload by proxy
 
 ```
 curl  -F "file=@/var/Windows-Server-2008-r2-Standard-Public.qcow2" "http://127.0.0.1:9000"
 ```
 
-5. You can see the exception：
+You can see the exception：
 
 ```
 io.netty.util.internal.OutOfDirectMemoryError: failed to allocate 16777216 byte(s) of direct memory (used: 939524127, max: 954728448)
