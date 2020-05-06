@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+  loops:
+    image: "lwydyby/upload-test:latest"
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      host: 127.0.0.1
+      port: 9001
+      JAVA_OPTS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    mem_limit: 4G

@@ -21,6 +21,25 @@ To run your application:
 ./gradlew clean run
 ```
 
+== Run with docker
+
+1. To run docker-compose:
+```
+docker-compose up -d
+```
+
+The service port is 9000
+
+
+
+== environment:
+
+host: The host to route to
+port: The port to route to
+JAVA_OPTS:  jvm option(default: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap)
+
+
+
 == Help
 
 * https://vertx.io/docs/[Vert.x Documentation]

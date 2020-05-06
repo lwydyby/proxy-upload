@@ -7,8 +7,14 @@ import com.loopswork.loops.handler.RequestHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.Router;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 @Singleton
@@ -27,6 +33,39 @@ public class RouterVerticle extends AbstractVerticle {
     //增加配置初始长度，规避可能存在的uri过长被服务器拒绝的问题
     HttpServerOptions options = new HttpServerOptions();
 
+    Router router1=Router.router(vertx);
+    router1.post().handler(routingContext -> {
+      String length = routingContext.request().headers().get("Content-Length");
+      System.out.println("Content-Length: " +length);
+      // 限制Content-Length大小
+      // To do
+      routingContext.request().handler(buffer -> {
+        System.out.println("I have received a chunk of the body of length " + buffer.length(
+        ));
+        FileOutputStream fos = null;
+        // 开一个流写文件
+        try {
+          fos = new FileOutputStream(new File( "test.txt"),true);
+          fos.write(buffer.getBytes(),0,buffer.length());
+          fos.flush();
+        } catch (IOException e) {
+          e.printStackTrace();
+        } finally {
+          if (fos != null) {
+            try {
+              fos.close();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      }).endHandler(event -> {
+        routingContext.response().end();
+      });
+
+    });
+
+
     //创建Http服务器
     vertx.createHttpServer(options).requestHandler(router).listen(9000, http -> {
       if (http.succeeded()) {
@@ -35,6 +74,9 @@ public class RouterVerticle extends AbstractVerticle {
         startFuture.handle(Future.failedFuture(http.cause()));
       }
     });
+    vertx.createHttpServer().requestHandler(router1).listen(9001);
+
+
   }
 
   private void initHandlers(Router router) {
