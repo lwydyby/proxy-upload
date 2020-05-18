@@ -7,7 +7,9 @@ import com.loopswork.loops.util.ClientManager;
 import com.loopswork.loops.util.ContextKeys;
 import com.loopswork.loops.util.TargetUtil;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.net.SocketAddress;
@@ -21,6 +23,8 @@ public class DirectHandler implements Handler<RoutingContext> {
   private ClientManager clientManager;
   @Inject
   private TargetUtil targetUtil;
+  @Inject
+  private Vertx vertx;
 
 
   @Override
@@ -34,7 +38,7 @@ public class DirectHandler implements Handler<RoutingContext> {
     HttpServerRequest req = context.request();
     // need Modify target
     TargetInfo targetInfo = targetUtil.getTargetInfo();
-    HttpClient client =  clientManager.getCurrentThreadHttpClient();
+    HttpClient client =  vertx.createHttpClient(new HttpClientOptions());
     HttpClientRequest c_req = client.request(VertHttpRequestWrapper.transMethod(request.getMethod()), SocketAddress.inetSocketAddress(targetInfo.getPort(), targetInfo.getHost())
       , targetInfo.getPort(), targetInfo.getHost(), req.uri(), res -> {
           context.response().setChunked(true);
@@ -50,7 +54,11 @@ public class DirectHandler implements Handler<RoutingContext> {
       }).exceptionHandler(context::fail);
     c_req.headers().setAll(context.request().headers());
     c_req.setChunked(true);
-    req.handler(c_req::write);
+    req.handler(data->{
+      c_req.write(data,event -> {
+        client.close();
+      });
+    });
     req.endHandler((v) -> {
       c_req.end();
     });
