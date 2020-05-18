@@ -32,7 +32,7 @@ public class ClientManager {
 
   public HttpClient getHttpClient(String key) {
     if (!httpClientMap.containsKey(key)) {
-      httpClientMap.put(key, vertx.createHttpClient(new HttpClientOptions()));
+      httpClientMap.put(key, vertx.createHttpClient(new HttpClientOptions().setIdleTimeout(1)));
       log.debug("create http client [{}]", key);
     }
     return httpClientMap.get(key);
