@@ -96,7 +96,9 @@ io.netty.util.internal.OutOfDirectMemoryError: failed to allocate 16777216 byte(
 == environment:
 
 host: The host to route to
+
 port: The port to route to
+
 JAVA_OPTS:  jvm option(default: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap)
 
 
