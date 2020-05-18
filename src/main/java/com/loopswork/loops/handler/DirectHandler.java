@@ -38,7 +38,7 @@ public class DirectHandler implements Handler<RoutingContext> {
     HttpServerRequest req = context.request();
     // need Modify target
     TargetInfo targetInfo = targetUtil.getTargetInfo();
-    HttpClient client =  vertx.createHttpClient(new HttpClientOptions());
+    HttpClient client =  clientManager.getCurrentThreadHttpClient();
     HttpClientRequest c_req = client.request(VertHttpRequestWrapper.transMethod(request.getMethod()), SocketAddress.inetSocketAddress(targetInfo.getPort(), targetInfo.getHost())
       , targetInfo.getPort(), targetInfo.getHost(), req.uri(), res -> {
           context.response().setChunked(true);
@@ -55,9 +55,7 @@ public class DirectHandler implements Handler<RoutingContext> {
     c_req.headers().setAll(context.request().headers());
     c_req.setChunked(true);
     req.handler(data->{
-      c_req.write(data,event -> {
-        client.close();
-      });
+      c_req.write(data);
     });
     req.endHandler((v) -> {
       c_req.end();
