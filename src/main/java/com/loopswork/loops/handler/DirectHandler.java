@@ -43,22 +43,23 @@ public class DirectHandler implements Handler<RoutingContext> {
       , targetInfo.getPort(), targetInfo.getHost(), req.uri(), res -> {
           context.response().setChunked(true);
           context.response().setStatusCode(res.statusCode());
-          context.response().headers().setAll(res.headers());
-          res.handler(data -> {
-            req.response().write(data);
+          res.pipeTo(req.response(),ar->{
+            if (ar.succeeded()){
+              req.response().end();
+            }else {
+              context.fail(ar.cause());
+            }
           });
           res.exceptionHandler(context::fail);
-          res.endHandler((v) -> {
-            req.response().end();
-          });
       }).exceptionHandler(context::fail);
     c_req.headers().setAll(context.request().headers());
     c_req.setChunked(true);
-    req.handler(data->{
-      c_req.write(data);
-    });
-    req.endHandler((v) -> {
-      c_req.end();
+    req.pipeTo(c_req,ar->{
+      if(ar.succeeded()){
+        c_req.end();
+      }else {
+        context.fail(ar.cause());
+      }
     });
   }
 
